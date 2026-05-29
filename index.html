@@ -268,67 +268,10 @@
         // WhatsApp number placeholder (editable/configured)
         const WHATSAPP_NUMBER = "919000000000"; // Format: CC + Mobile without symbols
 
-        // Premium Mock Data System - Active when firebase is empty, fails, or is loading
+        // Premium Mock Data System - Empty default state, ready for Firebase synchronization
         const mockBrandingLogo = "";
-        const mockCategories = {
-            "all": { id: "all", name: "All Products", image: "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?q=80&w=300&auto=format&fit=crop" },
-            "hoodies": { id: "hoodies", name: "Hoodies", image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=300&auto=format&fit=crop" },
-            "tees": { id: "tees", name: "Graphic Tees", image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=300&auto=format&fit=crop" },
-            "pants": { id: "pants", name: "Cargo & Pants", image: "https://images.unsplash.com/photo-1542272604-787c3835535d?q=80&w=300&auto=format&fit=crop" },
-            "accessories": { id: "accessories", name: "Accessories", image: "https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?q=80&w=300&auto=format&fit=crop" }
-        };
-        const mockProducts = {
-            "prod1": {
-                id: "prod1",
-                name: "Wildout Heavyweight Hoodie",
-                description: "450 GSM organic French Terry cotton. Drop shoulder streetwear silhouette, embroidered logo accents.",
-                price: 2499,
-                category: "hoodies",
-                stock: 12,
-                image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=800&auto=format&fit=crop",
-                sizes: ["S", "M", "L", "XL"]
-            },
-            "prod2": {
-                id: "prod2",
-                name: "Acid Wash Graphic Tee",
-                description: "Relaxed unisex streetwear fitting. Premium custom-dyed vintage black colorway with bright neon print.",
-                price: 1299,
-                category: "tees",
-                stock: 8,
-                image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?q=80&w=800&auto=format&fit=crop",
-                sizes: ["S", "M", "L", "XL"]
-            },
-            "prod3": {
-                id: "prod3",
-                name: "Cargo Combat Pants",
-                description: "Water-resistant tech ripstop. Adjustable utility ties, reinforced knees, clean industrial zippers.",
-                price: 3199,
-                category: "pants",
-                stock: 0, // SOLD OUT representation
-                image: "https://images.unsplash.com/photo-1542272604-787c3835535d?q=80&w=800&auto=format&fit=crop",
-                sizes: ["M", "L", "XL"]
-            },
-            "prod4": {
-                id: "prod4",
-                name: "Blaze Beanie Hat",
-                description: "Double layer ribbed knit with high-contrast electric orange detailing. Snug, stretch-to-fit style.",
-                price: 799,
-                category: "accessories",
-                stock: 15,
-                image: "https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?q=80&w=800&auto=format&fit=crop",
-                sizes: ["S", "M"]
-            },
-            "prod5": {
-                id: "prod5",
-                name: "Shattered Logo Tee",
-                description: "Unisex premium drop-shoulder white tee. Featuring the signature 2026 deconstructed Wildout front print.",
-                price: 1199,
-                category: "tees",
-                stock: 22,
-                image: "https://images.unsplash.com/photo-1554568218-0f1715e72254?q=80&w=800&auto=format&fit=crop",
-                sizes: ["S", "M", "L", "XL"]
-            }
-        };
+        const mockCategories = {};
+        const mockProducts = {};
 
         // Core State
         let categories = {};
