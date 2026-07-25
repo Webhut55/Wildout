@@ -1,895 +1,631 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WILDOUT — Premium Streetwear Storefront</title>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
-    <!-- Tailwind CSS (via Play CDN for rapid prototype & premium visuals) -->
+    <title>WILDOUT | Premium Unisex Streetwear</title>
+    <meta name="description" content="Shop WILDOUT for premium unisex streetwear, heavyweight tees, hoodies, and urban wear.">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+    
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        brand: {
-                            orange: '#fc5d00',
-                            orangeHover: '#d54e00',
-                            charcoal: '#1a1a1a',
-                            lightGray: '#fcfcfc',
-                            borderGray: '#e5e5e5'
-                        }
+                        primary: '#FF5200',
+                        primaryHover: '#FF7A38',
+                        dark: '#121212',
+                        darker: '#0a0a0a'
                     },
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        heading: ['Montserrat', 'sans-serif'],
+                        sans: ['Outfit', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        /* Hide scrollbars for categories row but allow scrolling */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
+        body { background-color: #f8f8f8; color: #121212; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .hero-gradient {
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1523398002811-999aa8e9f5b9?q=80&w=2070&auto=format&fit=crop') center/cover;
         }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        /* Custom focused state for sizes */
-        .size-active {
-            background-color: #1a1a1a !important;
-            color: #ffffff !important;
-            border-color: #1a1a1a !important;
-        }
+
+        /* Cart Drawer Animation */
+        #cart-drawer { transition: transform 0.3s ease-in-out; }
+        .translate-x-full { transform: translateX(100%); }
+        .translate-x-0 { transform: translateX(0); }
     </style>
 </head>
-<body class="bg-[#ffffff] text-brand-charcoal font-sans antialiased selection:bg-brand-orange selection:text-white">
+<body class="font-sans antialiased overflow-x-hidden">
 
-    <!-- Header / Navigation -->
-    <header class="sticky top-0 z-40 bg-[#ffffff] border-b border-brand-borderGray">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <!-- Brand Logo -->
-            <a href="#" class="flex items-center gap-3">
-                <img id="brand-logo" src="" alt="Wildout" class="h-8 w-auto object-contain hidden" />
-                <span id="brand-text" class="font-heading text-2xl font-black tracking-tighter text-brand-charcoal">
-                    WILD<span class="text-brand-orange">OUT</span>
-                </span>
-            </a>
+    <!-- Navbar -->
+    <nav class="sticky top-0 z-50 bg-white shadow-md border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="window.scrollTo(0,0)">
+                    <img id="store-logo-img" src="" alt="WILDOUT" class="h-10 hidden object-contain">
+                    <h1 id="store-logo-text" class="text-3xl font-black tracking-tighter uppercase text-dark">WILD<span class="text-primary">OUT</span></h1>
+                </div>
+                
+                <!-- Search -->
+                <div class="hidden md:flex flex-1 items-center justify-center px-8">
+                    <div class="relative w-full max-w-md">
+                        <input type="text" id="search-input" placeholder="Search streetwear..." class="w-full bg-gray-100 border-none rounded-full py-2 pl-10 pr-4 focus:ring-2 focus:ring-primary focus:bg-white transition-all text-sm font-medium">
+                        <i data-lucide="search" class="absolute left-3 top-2.5 h-4 w-4 text-gray-500"></i>
+                    </div>
+                </div>
 
-            <!-- Navigation Actions -->
-            <div class="flex items-center gap-4">
-                <button 
-                    id="cart-trigger" 
-                    class="relative p-2.5 hover:bg-neutral-50 transition-colors duration-200 border border-transparent hover:border-brand-borderGray rounded-none flex items-center justify-center"
-                    aria-label="Open Shopping Bag"
-                >
-                    <i data-lucide="shopping-bag" class="w-6 h-6 text-brand-charcoal"></i>
-                    <span 
-                        id="cart-badge" 
-                        class="absolute -top-1 -right-1 bg-brand-orange text-white text-[10px] font-heading font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white scale-0 transition-transform duration-300"
-                    >
-                        0
-                    </span>
-                </button>
+                <!-- Cart Icon -->
+                <div class="flex items-center">
+                    <button id="cart-toggle" class="relative p-2 text-dark hover:text-primary transition-colors">
+                        <i data-lucide="shopping-bag" class="h-6 w-6"></i>
+                        <span id="cart-badge" class="absolute top-0 right-0 -mt-1 -mr-1 bg-primary text-white text-[10px] font-bold h-5 w-5 rounded-full flex items-center justify-center">0</span>
+                    </button>
+                </div>
             </div>
+            
+            <!-- Mobile Search -->
+            <div class="md:hidden pb-4">
+                 <div class="relative w-full">
+                    <input type="text" id="mobile-search-input" placeholder="Search streetwear..." class="w-full bg-gray-100 border-none rounded-full py-2 pl-10 pr-4 focus:ring-2 focus:ring-primary focus:bg-white transition-all text-sm font-medium">
+                    <i data-lucide="search" class="absolute left-3 top-2.5 h-4 w-4 text-gray-500"></i>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative h-[60vh] hero-gradient flex items-center justify-center text-center px-4">
+        <div class="z-10 animate-fade-in-up">
+            <h2 class="text-5xl md:text-7xl font-black text-white uppercase tracking-tight mb-4 drop-shadow-lg">Own The Streets</h2>
+            <p class="text-lg md:text-xl text-gray-200 mb-8 max-w-2xl mx-auto font-light">Premium heavyweight tees & hoodies crafted for the urban landscape.</p>
+            <button onclick="document.getElementById('products').scrollIntoView({behavior: 'smooth'})" class="bg-primary hover:bg-primaryHover text-white font-bold py-4 px-10 rounded-full uppercase tracking-wider text-sm transition-transform transform hover:scale-105 shadow-[0_0_20px_rgba(255,82,0,0.4)]">
+                Shop The Drop
+            </button>
         </div>
     </header>
 
-    <!-- Hero Section / Brand Ethos Banner -->
-    <section class="bg-neutral-50 border-b border-brand-borderGray py-12 md:py-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-            <div class="max-w-2xl">
-                <p class="text-xs font-heading font-bold uppercase tracking-[0.2em] text-brand-orange mb-3">UNISEX APPAREL FOR THE WILD AT HEART</p>
-                <h1 class="font-heading text-4xl md:text-5xl font-black tracking-tight leading-none text-brand-charcoal uppercase mb-4">
-                    STREETWEAR FOR ALL
-                </h1>
-                <p class="text-neutral-600 text-sm md:text-base max-w-lg font-normal leading-relaxed">
-                    Designed for comfort, optimized for impact. Premium essentials celebrating freedom of expression without boundaries.
-                </p>
-            </div>
-            <div class="flex items-center gap-3 self-start md:self-auto">
-                <div class="h-[2px] w-12 bg-brand-orange"></div>
-                <span class="font-heading text-sm font-bold tracking-widest uppercase text-brand-charcoal">EDITION 2026</span>
+    <!-- Categories -->
+    <section class="py-6 bg-white border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex space-x-4 overflow-x-auto hide-scrollbar py-2" id="categories-container">
+                <button class="category-btn active px-6 py-2 rounded-full font-semibold text-sm whitespace-nowrap bg-dark text-white" data-category="all">All Gear</button>
+                <!-- Categories injected here -->
             </div>
         </div>
     </section>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <!-- Products Grid -->
+    <main id="products" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div class="flex justify-between items-end mb-8">
+            <h3 class="text-3xl font-black uppercase tracking-tight text-dark">Latest Drops</h3>
+        </div>
         
-        <!-- Category Selector Section -->
-        <section class="mb-12">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="font-heading text-lg font-extrabold tracking-wider uppercase text-brand-charcoal flex items-center gap-2">
-                    <span class="w-1.5 h-6 bg-brand-orange inline-block"></span>
-                    Explore Collections
-                </h2>
-                <span class="text-xs text-neutral-400 font-medium hidden sm:inline-block">Scroll horizontally to view more</span>
-            </div>
-            
-            <!-- Category row -->
-            <div 
-                id="categories-container" 
-                class="flex items-center gap-4 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0"
-            >
-                <!-- Skeletal / Loading State -->
-                <div class="flex gap-4 animate-pulse w-full">
-                    <div class="h-16 w-36 bg-neutral-100 flex-shrink-0"></div>
-                    <div class="h-16 w-36 bg-neutral-100 flex-shrink-0"></div>
-                    <div class="h-16 w-36 bg-neutral-100 flex-shrink-0"></div>
-                </div>
-            </div>
-        </section>
+        <div id="loading-products" class="flex justify-center py-20">
+            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
 
-        <!-- Product Grid Section -->
-        <section class="mb-20">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 border-b border-brand-borderGray pb-4">
-                <div>
-                    <h2 class="font-heading text-lg font-extrabold tracking-wider uppercase text-brand-charcoal flex items-center gap-2">
-                        <span class="w-1.5 h-6 bg-brand-orange inline-block"></span>
-                        Shop Apparel
-                    </h2>
-                    <p id="filter-status" class="text-xs text-neutral-500 mt-1">Showing all products</p>
-                </div>
-                <!-- Mini Sort Option or Stats -->
-                <div class="text-xs text-neutral-500 font-medium self-start sm:self-auto">
-                    <span id="product-count" class="font-bold text-brand-charcoal">0</span> apparel pieces loaded
-                </div>
-            </div>
-
-            <!-- Product Cards Layout -->
-            <div 
-                id="products-grid" 
-                class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-12 gap-x-8"
-            >
-                <!-- Loading State / Skeletons -->
-                <div class="animate-pulse space-y-4">
-                    <div class="aspect-[3/4] bg-neutral-100"></div>
-                    <div class="h-4 bg-neutral-100 w-2/3"></div>
-                    <div class="h-4 bg-neutral-100 w-1/3"></div>
-                </div>
-                <div class="animate-pulse space-y-4">
-                    <div class="aspect-[3/4] bg-neutral-100"></div>
-                    <div class="h-4 bg-neutral-100 w-2/3"></div>
-                    <div class="h-4 bg-neutral-100 w-1/3"></div>
-                </div>
-                <div class="animate-pulse space-y-4">
-                    <div class="aspect-[3/4] bg-neutral-100"></div>
-                    <div class="h-4 bg-neutral-100 w-2/3"></div>
-                    <div class="h-4 bg-neutral-100 w-1/3"></div>
-                </div>
-            </div>
-        </section>
+        <div id="products-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8 hidden">
+            <!-- Products injected here -->
+        </div>
+        
+        <div id="no-products" class="hidden text-center py-20 text-gray-500 font-medium">
+            No gear found matching your criteria.
+        </div>
     </main>
 
-    <!-- Side-Drawer Shopping Bag -->
-    <div 
-        id="cart-drawer-overlay" 
-        class="fixed inset-0 bg-neutral-900/60 backdrop-blur-xs z-50 transition-opacity duration-300 opacity-0 pointer-events-none"
-    >
-        <div 
-            id="cart-drawer" 
-            class="fixed top-0 right-0 h-full w-full max-w-md bg-[#ffffff] shadow-2xl z-50 flex flex-col translate-x-full transition-transform duration-300 ease-in-out border-l border-brand-borderGray"
-        >
-            <!-- Drawer Header -->
-            <div class="p-6 border-b border-brand-borderGray flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                    <i data-lucide="shopping-bag" class="w-5 h-5 text-brand-orange"></i>
-                    <span class="font-heading text-lg font-black uppercase tracking-tight">Your Bag</span>
-                </div>
-                <button 
-                    id="cart-close" 
-                    class="p-2 hover:bg-neutral-50 border border-transparent hover:border-brand-borderGray transition-colors"
-                    aria-label="Close Shopping Bag"
-                >
-                    <i data-lucide="x" class="w-5 h-5 text-brand-charcoal"></i>
-                </button>
-            </div>
-
-            <!-- Drawer Body / Cart Items -->
-            <div id="cart-items-container" class="flex-1 overflow-y-auto p-6 space-y-6">
-                <!-- Cart items dynamically render here -->
-                <div class="flex flex-col items-center justify-center py-20 text-center">
-                    <i data-lucide="archive" class="w-12 h-12 text-neutral-300 mb-4"></i>
-                    <p class="font-heading text-sm font-bold uppercase text-neutral-400">Your bag is empty</p>
-                    <p class="text-xs text-neutral-400 mt-1">Add items from the store to unlock checkouts.</p>
-                </div>
-            </div>
-
-            <!-- Drawer Footer -->
-            <div class="p-6 border-t border-brand-borderGray bg-neutral-50 space-y-4">
-                <div class="flex items-center justify-between text-brand-charcoal">
-                    <span class="text-xs font-heading font-bold uppercase tracking-wider text-neutral-500">Order Subtotal</span>
-                    <span id="cart-total-price" class="text-xl font-heading font-extrabold tracking-tight">₹0.00</span>
-                </div>
-                
-                <p class="text-[10px] text-neutral-500 leading-tight">
-                    * Orders are instantly compiled and transferred to our team via WhatsApp for direct verification, stock checks, and quick payment setup.
-                </p>
-
-                <!-- Bulk WhatsApp Checkout Trigger -->
-                <button 
-                    id="checkout-btn" 
-                    class="w-full bg-brand-orange hover:bg-brand-orangeHover text-white py-4 px-6 font-heading text-xs font-bold uppercase tracking-widest transition-all duration-200 flex items-center justify-center gap-2 hover:gap-3 disabled:opacity-40 disabled:cursor-not-allowed"
-                    disabled
-                >
-                    <span>Proceed to WhatsApp</span>
-                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Custom Flat Toast System -->
-    <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none"></div>
-
     <!-- Footer -->
-    <footer class="bg-neutral-50 border-t border-brand-borderGray py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div>
-                <p class="font-heading text-sm font-black tracking-tighter text-brand-charcoal">
-                    WILD<span class="text-brand-orange">OUT</span> APPAREL
-                </p>
-                <p class="text-xs text-neutral-500 mt-1">&copy; 2026 WILDOUT. All rights reserved.</p>
-            </div>
-            <div class="flex items-center gap-6">
-                <a href="#" class="text-xs text-neutral-500 hover:text-brand-orange transition-colors">Privacy Policy</a>
-                <a href="#" class="text-xs text-neutral-500 hover:text-brand-orange transition-colors">Shipping & Returns</a>
-                <a href="#" class="text-xs text-neutral-500 hover:text-brand-orange transition-colors">Terms of Service</a>
+    <footer class="bg-darker text-white py-12 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <h2 class="text-3xl font-black tracking-tighter uppercase mb-4">WILD<span class="text-primary">OUT</span></h2>
+            <p class="text-gray-400 text-sm mb-8">Premium Unisex Streetwear. Born in the streets.</p>
+            <div class="text-xs text-gray-600 uppercase tracking-widest">
+                &copy; <span id="year"></span> WILDOUT. All rights reserved.
             </div>
         </div>
     </footer>
 
-    <!-- Firebase App and Realtime Database SDKs via CDN -->
+    <!-- Product Detail Modal -->
+    <div id="product-modal" class="fixed inset-0 z-[100] hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl overflow-hidden w-full max-w-4xl max-h-[90vh] flex flex-col md:flex-row shadow-2xl relative transform scale-95 transition-transform duration-300">
+            <button id="close-modal" class="absolute top-4 right-4 z-10 bg-white/50 backdrop-blur hover:bg-white p-2 rounded-full text-dark transition-colors">
+                <i data-lucide="x" class="h-5 w-5"></i>
+            </button>
+            
+            <div class="w-full md:w-1/2 bg-gray-100 h-64 md:h-auto relative">
+                <img id="modal-img" src="" alt="Product" class="w-full h-full object-cover">
+            </div>
+            
+            <div class="w-full md:w-1/2 p-6 md:p-10 flex flex-col overflow-y-auto">
+                <span id="modal-category" class="text-primary text-xs font-bold uppercase tracking-widest mb-2">Category</span>
+                <h2 id="modal-title" class="text-3xl font-black uppercase text-dark mb-2 leading-tight">Product Name</h2>
+                <div id="modal-price" class="text-2xl font-bold text-gray-900 mb-6">₹0</div>
+                
+                <p id="modal-desc" class="text-gray-600 mb-8 text-sm leading-relaxed"></p>
+                
+                <div class="mb-8" id="size-selector-container">
+                    <h4 class="text-sm font-bold text-dark uppercase mb-3 flex items-center gap-2">Select Size <span class="text-xs text-gray-400 font-normal normal-case">(Required)</span></h4>
+                    <div id="modal-sizes" class="flex gap-3">
+                        <!-- Sizes injected here -->
+                    </div>
+                </div>
+                
+                <div class="mt-auto">
+                    <button id="modal-add-btn" class="w-full bg-dark hover:bg-black text-white font-bold py-4 rounded-xl uppercase tracking-wider text-sm transition-all flex justify-center items-center gap-2">
+                        <i data-lucide="shopping-cart" class="h-4 w-4"></i> Add to Cart
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide-over Cart -->
+    <div id="cart-overlay" class="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm hidden opacity-0 transition-opacity"></div>
+    <div id="cart-drawer" class="fixed inset-y-0 right-0 z-[70] w-full max-w-md bg-white shadow-2xl transform translate-x-full flex flex-col">
+        <!-- Cart Header -->
+        <div class="flex items-center justify-between p-6 border-b border-gray-100">
+            <h2 class="text-xl font-black uppercase tracking-tight text-dark flex items-center gap-2">
+                <i data-lucide="shopping-bag" class="h-5 w-5 text-primary"></i> Your Cart
+            </h2>
+            <button id="close-cart" class="p-2 text-gray-400 hover:text-dark transition-colors">
+                <i data-lucide="x" class="h-6 w-6"></i>
+            </button>
+        </div>
+
+        <!-- Cart Items -->
+        <div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-6">
+            <!-- Items injected here -->
+            <div id="empty-cart" class="h-full flex flex-col items-center justify-center text-gray-400 space-y-4">
+                <i data-lucide="shopping-cart" class="h-16 w-16 opacity-20"></i>
+                <p class="font-medium">Your cart is empty.</p>
+                <button onclick="document.getElementById('close-cart').click()" class="text-primary font-bold text-sm uppercase hover:underline">Continue Shopping</button>
+            </div>
+        </div>
+
+        <!-- Checkout Section -->
+        <div class="border-t border-gray-100 p-6 bg-gray-50 space-y-4">
+            <div class="flex justify-between items-center text-lg font-bold text-dark mb-4">
+                <span>Total</span>
+                <span id="cart-total">₹0</span>
+            </div>
+            
+            <div id="checkout-form" class="space-y-3 hidden">
+                <input type="text" id="cust-name" placeholder="Full Name" class="w-full border-gray-300 rounded-lg py-3 px-4 text-sm focus:ring-primary focus:border-primary">
+                <textarea id="cust-address" placeholder="Delivery Address & Pincode" rows="2" class="w-full border-gray-300 rounded-lg py-3 px-4 text-sm focus:ring-primary focus:border-primary"></textarea>
+            </div>
+
+            <button id="checkout-btn" disabled class="w-full bg-primary hover:bg-dark disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl uppercase tracking-wider text-sm transition-colors flex justify-center items-center gap-2">
+                <i data-lucide="shopping-cart" class="h-4 w-4"></i> Place Order
+            </button>
+        </div>
+    </div>
+
+
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-analytics.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
-        // Firebase Configuration Node
         const firebaseConfig = {
-            databaseURL: "https://wildout-b9606-default-rtdb.firebaseio.com/"
+            apiKey: "AIzaSyAN0uQ6NuZQFqqvXEGP7qYdo7MgGycRqFo",
+            authDomain: "wildoutstreetwear.firebaseapp.com",
+            databaseURL: "https://wildoutstreetwear-default-rtdb.firebaseio.com",
+            projectId: "wildoutstreetwear",
+            storageBucket: "wildoutstreetwear.firebasestorage.app",
+            messagingSenderId: "348462697003",
+            appId: "1:348462697003:web:ca5991b79b0b0f5158b86e",
+            measurementId: "G-846PJXLF1W"
         };
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getDatabase(app);
 
-        // Initialize Firebase
-        let db = null;
-        try {
-            const app = initializeApp(firebaseConfig);
-            db = getDatabase(app);
-        } catch (error) {
-            console.warn("Firebase failed to initialize. Using demo/fallback mock data system.", error);
+        // State
+        let productsData = {};
+        let categoriesData = {};
+        let currentCategory = 'all';
+        let searchQuery = '';
+        let cart = JSON.parse(localStorage.getItem('wildout_cart')) || [];
+        let activeProductForModal = null;
+        let selectedSizeForModal = null;
+
+        // Icons
+        lucide.createIcons();
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // DOM Elements
+        const productsGrid = document.getElementById('products-grid');
+        const loadingProducts = document.getElementById('loading-products');
+        const noProducts = document.getElementById('no-products');
+        const categoriesContainer = document.getElementById('categories-container');
+        
+        function getLocal(key) {
+            try { return JSON.parse(localStorage.getItem(key)) || {}; }
+            catch(e) { return {}; }
         }
 
-        // WhatsApp number placeholder (editable/configured)
-        const WHATSAPP_NUMBER = "919000000000"; // Format: CC + Mobile without symbols
-
-        // Premium Mock Data System - Empty default state, ready for Firebase synchronization
-        const mockBrandingLogo = "";
-        const mockCategories = {};
-        const mockProducts = {};
-
-        // Core State
-        let categories = {};
-        let products = {};
-        let selectedCategory = "all";
-        let shoppingBag = JSON.parse(localStorage.getItem('wildout_bag')) || [];
-
-        // Dynamic State for individual products sizes selection in grid
-        const selectedSizesState = {};
-
-        // Application Elements
-        const elements = {
-            brandLogo: document.getElementById('brand-logo'),
-            brandText: document.getElementById('brand-text'),
-            categoriesContainer: document.getElementById('categories-container'),
-            productsGrid: document.getElementById('products-grid'),
-            filterStatus: document.getElementById('filter-status'),
-            productCount: document.getElementById('product-count'),
-            cartTrigger: document.getElementById('cart-trigger'),
-            cartBadge: document.getElementById('cart-badge'),
-            cartOverlay: document.getElementById('cart-drawer-overlay'),
-            cartDrawer: document.getElementById('cart-drawer'),
-            cartClose: document.getElementById('cart-close'),
-            cartItemsContainer: document.getElementById('cart-items-container'),
-            cartTotalPrice: document.getElementById('cart-total-price'),
-            checkoutBtn: document.getElementById('checkout-btn'),
-            toastContainer: document.getElementById('toast-container')
-        };
-
-        // Flat Notification Toast Engine
-        function showToast(message, isError = false) {
-            const toast = document.createElement('div');
-            toast.className = `flex items-center gap-3 bg-white border-2 ${isError ? 'border-red-500 text-red-700' : 'border-brand-orange text-brand-charcoal'} px-5 py-4 shadow-xl pointer-events-auto transform translate-y-2 opacity-0 transition-all duration-300 ease-out max-w-sm w-full`;
-            
-            const icon = isError ? 'alert-triangle' : 'shopping-bag';
-            toast.innerHTML = `
-                <i data-lucide="${icon}" class="w-5 h-5 flex-shrink-0 ${isError ? 'text-red-500' : 'text-brand-orange'}"></i>
-                <span class="text-xs font-heading font-bold uppercase tracking-wider">${message}</span>
-            `;
-            
-            elements.toastContainer.appendChild(toast);
-            lucide.createIcons();
-
-            // Slide up and fade in
-            setTimeout(() => {
-                toast.classList.remove('translate-y-2', 'opacity-0');
-            }, 10);
-
-            // Toast slide-out and remove
-            setTimeout(() => {
-                toast.classList.add('translate-y-2', 'opacity-0');
-                setTimeout(() => {
-                    toast.remove();
-                }, 300);
-            }, 3000);
-        }
-
-        // Init App and Listen for Data
-        function startStorefront() {
-            if (db) {
-                // Fetch branding logo
-                onValue(ref(db, 'branding/logo'), (snapshot) => {
-                    const logoData = snapshot.val();
-                    if (logoData) {
-                        elements.brandLogo.src = logoData;
-                        elements.brandLogo.classList.remove('hidden');
-                        elements.brandText.classList.add('hidden');
-                    } else {
-                        // Fallback to text logo
-                        elements.brandLogo.classList.add('hidden');
-                        elements.brandText.classList.remove('hidden');
-                    }
-                }, { onlyOnce: false });
-
-                // Fetch Categories
-                onValue(ref(db, 'categories'), (snapshot) => {
-                    const data = snapshot.val();
-                    if (data) {
-                        categories = typeof data === 'object' && !Array.isArray(data) ? data : {};
-                        renderCategories();
-                    } else {
-                        categories = mockCategories;
-                        renderCategories();
-                    }
-                });
-
-                // Fetch Products
-                onValue(ref(db, 'products'), (snapshot) => {
-                    const data = snapshot.val();
-                    if (data) {
-                        // Support both object indexing or parsed array configurations from RTDB
-                        if (Array.isArray(data)) {
-                            products = {};
-                            data.forEach((p, idx) => {
-                                if (p) products[p.id || `p_${idx}`] = p;
-                            });
-                        } else {
-                            products = data;
-                        }
-                        renderProducts();
-                    } else {
-                        products = mockProducts;
-                        renderProducts();
-                    }
-                });
+        // Logo Logic
+        onValue(ref(db, 'wildout/settings/logo'), (snapshot) => {
+            const logoUrl = snapshot.val() || localStorage.getItem('wildout_logo');
+            const imgEl = document.getElementById('store-logo-img');
+            const txtEl = document.getElementById('store-logo-text');
+            if(logoUrl) {
+                imgEl.src = logoUrl;
+                imgEl.classList.remove('hidden');
+                txtEl.classList.add('hidden');
             } else {
-                // Completely Offline / Standalone Mock Setup
-                categories = mockCategories;
-                products = mockProducts;
-                renderCategories();
-                renderProducts();
+                imgEl.classList.add('hidden');
+                txtEl.classList.remove('hidden');
             }
+        });
 
-            updateCartUI();
-            setupEventListeners();
-            lucide.createIcons();
-        }
+        // Fetch Categories
+        onValue(ref(db, 'wildout/categories'), (snapshot) => {
+            const val = snapshot.val();
+            categoriesData = (val && Object.keys(val).length > 0) ? val : getLocal('wildout_categories');
+            renderCategories();
+        }, (error) => {
+            console.warn("Categories fetch fallback:", error);
+            categoriesData = getLocal('wildout_categories');
+            renderCategories();
+        });
 
-        // Render Dynamic Category Selectors
+        // Fetch Products
+        onValue(ref(db, 'wildout/products'), (snapshot) => {
+            const val = snapshot.val();
+            productsData = (val && Object.keys(val).length > 0) ? val : getLocal('wildout_products');
+            loadingProducts.classList.add('hidden');
+            renderProducts();
+        }, (error) => {
+            console.warn("Products fetch fallback:", error);
+            productsData = getLocal('wildout_products');
+            loadingProducts.classList.add('hidden');
+            renderProducts();
+        });
+
         function renderCategories() {
-            elements.categoriesContainer.innerHTML = '';
+            // Keep "All Gear"
+            categoriesContainer.innerHTML = `<button class="category-btn active px-6 py-2 rounded-full font-semibold text-sm whitespace-nowrap bg-dark text-white transition-colors" data-category="all">All Gear</button>`;
             
-            // Generate standard "All" category
-            const allBtn = document.createElement('button');
-            allBtn.className = `category-card flex items-center gap-3 p-3 border ${selectedCategory === 'all' ? 'border-brand-orange bg-[#ffffff]' : 'border-brand-borderGray hover:border-neutral-400 bg-white'} transition-all duration-200 flex-shrink-0 cursor-pointer`;
-            allBtn.dataset.catId = 'all';
-            
-            allBtn.innerHTML = `
-                <div class="w-10 h-10 bg-brand-orange/10 flex items-center justify-center text-brand-orange">
-                    <i data-lucide="grid" class="w-5 h-5"></i>
-                </div>
-                <div class="text-left pr-4">
-                    <p class="font-heading text-xs font-extrabold uppercase tracking-wider text-brand-charcoal">All Items</p>
-                    <p class="text-[10px] text-neutral-400 font-medium">Full Collection</p>
-                </div>
-            `;
-            elements.categoriesContainer.appendChild(allBtn);
-
-            // Generate active dynamic categories
-            Object.keys(categories).forEach(key => {
-                const cat = categories[key];
-                if (!cat || cat.id === 'all') return; // Skip standard duplicate
-
+            Object.keys(categoriesData).forEach(key => {
+                const cat = categoriesData[key];
                 const btn = document.createElement('button');
-                btn.className = `category-card flex items-center gap-3 p-3 border ${selectedCategory === cat.id ? 'border-brand-orange bg-[#ffffff]' : 'border-brand-borderGray hover:border-neutral-400 bg-white'} transition-all duration-200 flex-shrink-0 cursor-pointer`;
-                btn.dataset.catId = cat.id;
-
-                const fallbackImg = `https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=150&auto=format&fit=crop`;
-
-                btn.innerHTML = `
-                    <div class="w-10 h-10 overflow-hidden bg-neutral-100 flex-shrink-0">
-                        <img 
-                            src="${cat.image || fallbackImg}" 
-                            alt="${cat.name}" 
-                            class="w-full h-full object-cover"
-                            onerror="this.src='${fallbackImg}'"
-                        />
-                    </div>
-                    <div class="text-left pr-4">
-                        <p class="font-heading text-xs font-extrabold uppercase tracking-wider text-brand-charcoal">${cat.name}</p>
-                        <p class="text-[10px] text-neutral-400 font-medium">Wildout Apparel</p>
-                    </div>
-                `;
-                elements.categoriesContainer.appendChild(btn);
+                btn.className = `category-btn px-6 py-2 rounded-full font-semibold text-sm whitespace-nowrap bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors flex items-center gap-2`;
+                btn.dataset.category = cat.name;
+                let content = '';
+                if(cat.image) {
+                    content += `<img src="${cat.image}" class="w-5 h-5 rounded-full object-cover">`;
+                }
+                content += `<span>${cat.name}</span>`;
+                btn.innerHTML = content;
+                categoriesContainer.appendChild(btn);
             });
 
-            // Reinitialize icons in new markup
-            lucide.createIcons();
-
-            // Add click events to newly created tags
-            document.querySelectorAll('.category-card').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    selectedCategory = btn.dataset.catId;
-                    renderCategories();
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                if(btn.dataset.category === currentCategory) {
+                    btn.classList.replace('bg-gray-200', 'bg-dark');
+                    btn.classList.replace('text-gray-700', 'text-white');
+                    btn.classList.add('active');
+                }
+                
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.category-btn').forEach(b => {
+                        b.classList.remove('active');
+                        b.classList.replace('bg-dark', 'bg-gray-200');
+                        b.classList.replace('text-white', 'text-gray-700');
+                    });
+                    const target = e.currentTarget;
+                    target.classList.add('active');
+                    target.classList.replace('bg-gray-200', 'bg-dark');
+                    target.classList.replace('text-gray-700', 'text-white');
+                    currentCategory = target.dataset.category;
                     renderProducts();
                 });
             });
         }
 
-        // Render Dynamic Product Grid
         function renderProducts() {
-            elements.productsGrid.innerHTML = '';
-            
-            // Filter dynamic products based on current selection
-            const filteredProducts = Object.values(products).filter(product => {
-                if (!product) return false;
-                if (selectedCategory === 'all') return true;
-                return product.category === selectedCategory;
+            productsGrid.innerHTML = '';
+            let count = 0;
+            const q = searchQuery.toLowerCase();
+
+            Object.keys(productsData).forEach(key => {
+                const p = productsData[key];
+                
+                // Filtering
+                const matchCat = currentCategory === 'all' || p.category === currentCategory;
+                const matchSearch = p.name.toLowerCase().includes(q) || (p.description && p.description.toLowerCase().includes(q));
+                
+                if(matchCat && matchSearch) {
+                    count++;
+                    const card = document.createElement('div');
+                    card.className = 'bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group cursor-pointer border border-gray-100 flex flex-col h-full';
+                    card.onclick = () => openModal(key, p);
+                    
+                    const priceFormatted = new Intl.NumberFormat('en-IN').format(p.price);
+
+                    card.innerHTML = `
+                        <div class="relative aspect-[4/5] overflow-hidden bg-gray-100">
+                            <img src="${p.image || ''}" alt="${p.name}" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500" loading="lazy">
+                            <div class="absolute top-3 left-3 bg-white/90 backdrop-blur px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full shadow-sm text-dark">${p.category || 'Gear'}</div>
+                        </div>
+                        <div class="p-4 md:p-5 flex flex-col flex-1">
+                            <h4 class="font-bold text-dark text-lg leading-tight mb-1 line-clamp-1">${p.name}</h4>
+                            <p class="text-xs text-gray-500 mb-3 line-clamp-2">${p.description || ''}</p>
+                            <div class="mt-auto flex items-center justify-between">
+                                <span class="font-black text-lg text-primary">₹${priceFormatted}</span>
+                                <button class="bg-primary text-white hover:bg-dark p-2 rounded-full transition-colors">Add to Cart</button>
+                            </div>
+                        </div>
+                    `;
+                    productsGrid.appendChild(card);
+                }
             });
 
-            // Update counter labels and filters UI
-            elements.productCount.textContent = filteredProducts.length;
-            if (selectedCategory === 'all') {
-                elements.filterStatus.textContent = "Showing all products in our catalog";
+            if(count > 0) {
+                productsGrid.classList.remove('hidden');
+                noProducts.classList.add('hidden');
             } else {
-                const categoryName = categories[selectedCategory]?.name || selectedCategory;
-                elements.filterStatus.textContent = `Filtered by category: ${categoryName}`;
+                productsGrid.classList.add('hidden');
+                noProducts.classList.remove('hidden');
+            }
+            lucide.createIcons();
+        }
+
+        // Search Handlers
+        ['search-input', 'mobile-search-input'].forEach(id => {
+            document.getElementById(id).addEventListener('input', (e) => {
+                searchQuery = e.target.value;
+                // Sync inputs
+                if(id === 'search-input') document.getElementById('mobile-search-input').value = searchQuery;
+                else document.getElementById('search-input').value = searchQuery;
+                renderProducts();
+            });
+        });
+
+        // Modal Logic
+        const modal = document.getElementById('product-modal');
+        const closeModalBtn = document.getElementById('close-modal');
+        
+        function openModal(id, product) {
+            activeProductForModal = { id, ...product };
+            selectedSizeForModal = null;
+
+            document.getElementById('modal-img').src = product.image || '';
+            document.getElementById('modal-category').textContent = product.category || 'Gear';
+            document.getElementById('modal-title').textContent = product.name;
+            document.getElementById('modal-price').textContent = `₹${new Intl.NumberFormat('en-IN').format(product.price)}`;
+            document.getElementById('modal-desc').textContent = product.description || '';
+
+            const sizesContainer = document.getElementById('modal-sizes');
+            sizesContainer.innerHTML = '';
+            
+            if(product.sizes && product.sizes.length > 0) {
+                document.getElementById('size-selector-container').classList.remove('hidden');
+                product.sizes.forEach(size => {
+                    const btn = document.createElement('button');
+                    btn.className = `w-12 h-12 rounded-lg border-2 border-gray-200 font-bold text-sm flex items-center justify-center transition-all hover:border-dark`;
+                    btn.textContent = size;
+                    btn.onclick = () => selectSize(btn, size);
+                    sizesContainer.appendChild(btn);
+                });
+            } else {
+                 document.getElementById('size-selector-container').classList.add('hidden');
+                 selectedSizeForModal = 'OS'; // One Size
             }
 
-            if (filteredProducts.length === 0) {
-                elements.productsGrid.innerHTML = `
-                    <div class="col-span-full py-16 flex flex-col items-center justify-center border border-dashed border-brand-borderGray">
-                        <i data-lucide="package" class="w-12 h-12 text-neutral-300 mb-3"></i>
-                        <p class="font-heading text-xs font-bold uppercase tracking-widest text-neutral-400">No items available</p>
-                        <p class="text-xs text-neutral-400 mt-1">There are no garments configured in this specific division.</p>
-                    </div>
-                `;
-                lucide.createIcons();
+            modal.classList.remove('hidden');
+            // small delay for transition
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.querySelector('div').classList.remove('scale-95');
+            }, 10);
+        }
+
+        function selectSize(btn, size) {
+            selectedSizeForModal = size;
+            document.querySelectorAll('#modal-sizes button').forEach(b => {
+                b.classList.remove('border-dark', 'bg-dark', 'text-white');
+                b.classList.add('border-gray-200', 'text-dark');
+            });
+            btn.classList.remove('border-gray-200', 'text-dark');
+            btn.classList.add('border-dark', 'bg-dark', 'text-white');
+        }
+
+        function closeModal() {
+            modal.classList.add('opacity-0');
+            modal.querySelector('div').classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                activeProductForModal = null;
+            }, 300);
+        }
+
+        closeModalBtn.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if(e.target === modal) closeModal();
+        });
+
+        document.getElementById('modal-add-btn').addEventListener('click', () => {
+            if(!activeProductForModal) return;
+            if(!selectedSizeForModal) {
+                alert('Please select a size.');
                 return;
             }
 
-            filteredProducts.forEach(product => {
-                // Initialize default selection size if not defined yet
-                const sizeOptions = product.sizes || ["S", "M", "L", "XL"];
-                if (!selectedSizesState[product.id]) {
-                    selectedSizesState[product.id] = sizeOptions[0];
-                }
-
-                const card = document.createElement('div');
-                card.className = "group flex flex-col bg-white border border-brand-borderGray relative";
-
-                const isOutOfStock = !product.stock || product.stock <= 0;
-
-                // Create size buttons layout
-                const sizeButtonsHTML = sizeOptions.map(sz => `
-                    <button 
-                        data-prod-id="${product.id}" 
-                        data-size="${sz}"
-                        class="size-sel-btn border border-brand-borderGray px-2 py-1.5 text-xs font-heading font-extrabold uppercase transition-all duration-150 flex-grow hover:bg-neutral-50 ${selectedSizesState[product.id] === sz ? 'size-active' : ''}"
-                        ${isOutOfStock ? 'disabled' : ''}
-                    >
-                        ${sz}
-                    </button>
-                `).join('');
-
-                // Image placeholder fallback
-                const fallbackImg = `https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=800&auto=format&fit=crop`;
-
-                card.innerHTML = `
-                    <!-- Product Image container with precise flat border design -->
-                    <div class="aspect-[3/4] overflow-hidden bg-neutral-100 relative border-b border-brand-borderGray">
-                        <img 
-                            src="${product.image || fallbackImg}" 
-                            alt="${product.name}" 
-                            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                            onerror="this.src='${fallbackImg}'"
-                        />
-                        ${isOutOfStock ? `
-                            <div class="absolute inset-0 bg-[#ffffff]/95 flex flex-col items-center justify-center p-4">
-                                <div class="border-2 border-neutral-800 px-6 py-2">
-                                    <p class="font-heading text-sm font-black tracking-widest uppercase text-neutral-800">SOLD OUT</p>
-                                </div>
-                            </div>
-                        ` : ''}
-                    </div>
-
-                    <!-- Details Area -->
-                    <div class="p-5 flex-1 flex flex-col">
-                        <div class="flex items-start justify-between gap-2 mb-2">
-                            <h3 class="font-heading text-sm font-black uppercase tracking-tight text-brand-charcoal group-hover:text-brand-orange transition-colors">
-                                ${product.name}
-                            </h3>
-                            <span class="font-heading text-sm font-black tracking-tight text-brand-charcoal whitespace-nowrap">
-                                ₹${parseFloat(product.price).toLocaleString('en-IN')}
-                            </span>
-                        </div>
-                        <p class="text-xs text-neutral-500 leading-relaxed mb-4 flex-1">
-                            ${product.description || 'Premium unisex lifestyle streetwear built with precision fit.'}
-                        </p>
-
-                        <!-- Size Selector Row -->
-                        <div class="mb-5 ${isOutOfStock ? 'opacity-30' : ''}">
-                            <p class="text-[10px] font-heading font-bold uppercase tracking-wider text-neutral-400 mb-2">Select Fit Size</p>
-                            <div class="flex flex-wrap gap-1">
-                                ${sizeButtonsHTML}
-                            </div>
-                        </div>
-
-                        <!-- Actions Grid -->
-                        <div class="grid grid-cols-2 gap-2 mt-auto">
-                            <button 
-                                data-prod-id="${product.id}"
-                                class="add-to-bag-btn bg-white border-2 border-brand-charcoal text-brand-charcoal hover:bg-neutral-50 py-3 text-[10px] font-heading font-bold uppercase tracking-wider transition-colors duration-150 disabled:opacity-30 disabled:pointer-events-none"
-                                ${isOutOfStock ? 'disabled' : ''}
-                            >
-                                Add to Bag
-                            </button>
-                            <button 
-                                data-prod-id="${product.id}"
-                                class="buy-now-btn bg-brand-orange border-2 border-brand-orange text-white hover:bg-brand-orangeHover py-3 text-[10px] font-heading font-bold uppercase tracking-wider transition-colors duration-150 disabled:opacity-30 disabled:pointer-events-none"
-                                ${isOutOfStock ? 'disabled' : ''}
-                            >
-                                Buy Now
-                            </button>
-                        </div>
-                    </div>
-                `;
-
-                elements.productsGrid.appendChild(card);
-            });
-
-            // Set up Interactive events within newly generated Product cards
-            setupGridActions();
-        }
-
-        // Manage Interactive sizes and cart-adding functions
-        function setupGridActions() {
-            // Interactive Sizes Changes
-            document.querySelectorAll('.size-sel-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const prodId = btn.dataset.prodId;
-                    const size = btn.dataset.size;
-                    
-                    selectedSizesState[prodId] = size;
-                    
-                    // Re-render only size elements in parent grid or re-render entire grid
-                    // Simple full re-render keeps UI states synchronized flawlessly
-                    renderProducts();
-                });
-            });
-
-            // Interactive "Add to Bag" Event
-            document.querySelectorAll('.add-to-bag-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const prodId = btn.dataset.prodId;
-                    addToCart(prodId);
-                });
-            });
-
-            // Interactive "Buy Now" (Instant One-click Checkouts)
-            document.querySelectorAll('.buy-now-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const prodId = btn.dataset.prodId;
-                    triggerInstantBuy(prodId);
-                });
-            });
-        }
-
-        // Core Shopping Bag Manipulation Logic
-        function addToCart(productId) {
-            const product = products[productId];
-            const chosenSize = selectedSizesState[productId];
-
-            if (!product || !chosenSize) return;
-
-            // Check if exact product configuration (ID + Size) is already in the bag
-            const existingIndex = shoppingBag.findIndex(item => item.id === productId && item.size === chosenSize);
-
-            if (existingIndex > -1) {
-                // Ensure customer doesn't add more than configured inventory allows
-                const nextQuantity = shoppingBag[existingIndex].qty + 1;
-                if (nextQuantity <= product.stock) {
-                    shoppingBag[existingIndex].qty = nextQuantity;
-                    showToast(`Added another ${product.name} (${chosenSize}) to your Bag`);
-                } else {
-                    showToast(`Sorry, stock limit reached for size ${chosenSize}.`, true);
-                    return;
-                }
+            const existingItem = cart.find(item => item.id === activeProductForModal.id && item.size === selectedSizeForModal);
+            if(existingItem) {
+                existingItem.qty += 1;
             } else {
-                shoppingBag.push({
-                    id: productId,
-                    name: product.name,
-                    price: product.price,
-                    size: chosenSize,
-                    image: product.image,
+                cart.push({
+                    id: activeProductForModal.id,
+                    name: activeProductForModal.name,
+                    price: activeProductForModal.price,
+                    image: activeProductForModal.image,
+                    size: selectedSizeForModal,
                     qty: 1
                 });
-                showToast(`Added ${product.name} (${chosenSize}) to Bag`);
             }
+            saveCart();
+            closeModal();
+            openCart();
+        });
 
-            saveBagState();
+        // Cart Logic
+        const cartToggle = document.getElementById('cart-toggle');
+        const cartOverlay = document.getElementById('cart-overlay');
+        const cartDrawer = document.getElementById('cart-drawer');
+        const closeCartBtn = document.getElementById('close-cart');
+        const cartBadge = document.getElementById('cart-badge');
+        const cartItemsContainer = document.getElementById('cart-items');
+        const emptyCartMsg = document.getElementById('empty-cart');
+        const checkoutForm = document.getElementById('checkout-form');
+        const checkoutBtn = document.getElementById('checkout-btn');
+
+        function saveCart() {
+            localStorage.setItem('wildout_cart', JSON.stringify(cart));
             updateCartUI();
         }
 
-        // Trigger Instant One-Item WhatsApp Link
-        function triggerInstantBuy(productId) {
-            const product = products[productId];
-            const size = selectedSizesState[productId];
-            if (!product) return;
-
-            const total = parseFloat(product.price);
-            
-            // Build simple formatted string
-            const message = `⚡ WILDOUT — INSTANT BUY NOW ⚡\n\n` +
-                            `I want to buy this item immediately:\n` +
-                            `• ${product.name}\n` +
-                            `  Size: ${size}\n` +
-                            `  Qty: 1\n` +
-                            `  Price: ₹${total.toLocaleString('en-IN')}\n\n` +
-                            `Grand Total: ₹${total.toLocaleString('en-IN')}\n` +
-                            `Please confirm availability and sharing details for payment options.`;
-
-            const encodedMessage = encodeURIComponent(message);
-            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`, '_blank');
-        }
-
-        // Remove single item logic
-        function removeFromCart(id, size) {
-            shoppingBag = shoppingBag.filter(item => !(item.id === id && item.size === size));
-            showToast("Item removed from your bag");
-            saveBagState();
-            updateCartUI();
-        }
-
-        // Modify Quantity
-        function updateQuantity(id, size, change) {
-            const index = shoppingBag.findIndex(item => item.id === id && item.size === size);
-            if (index === -1) return;
-
-            const product = products[id];
-            const nextQty = shoppingBag[index].qty + change;
-
-            if (nextQty <= 0) {
-                removeFromCart(id, size);
-                return;
-            }
-
-            // Verify stock constraints (if stock info exists)
-            if (product && nextQty > product.stock) {
-                showToast(`Cannot add more. Only ${product.stock} pieces in stock.`, true);
-                return;
-            }
-
-            shoppingBag[index].qty = nextQty;
-            saveBagState();
-            updateCartUI();
-        }
-
-        // Save progress using localStorage
-        function saveBagState() {
-            localStorage.setItem('wildout_bag', JSON.stringify(shoppingBag));
-        }
-
-        // Synchronize and update entire Cart UI Drawer representation
         function updateCartUI() {
-            // Badge update
-            const totalItems = shoppingBag.reduce((sum, item) => sum + item.qty, 0);
-            elements.cartBadge.textContent = totalItems;
-            if (totalItems > 0) {
-                elements.cartBadge.classList.remove('scale-0');
-                elements.cartBadge.classList.add('scale-100');
-            } else {
-                elements.cartBadge.classList.remove('scale-100');
-                elements.cartBadge.classList.add('scale-0');
-            }
-
-            // Build item list
-            elements.cartItemsContainer.innerHTML = '';
+            const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+            cartBadge.textContent = totalItems;
             
-            if (shoppingBag.length === 0) {
-                elements.cartItemsContainer.innerHTML = `
-                    <div class="flex flex-col items-center justify-center py-24 text-center">
-                        <i data-lucide="shopping-bag" class="w-12 h-12 text-neutral-300 mb-4"></i>
-                        <p class="font-heading text-xs font-bold uppercase tracking-wider text-neutral-400">Your bag is empty</p>
-                        <p class="text-[10px] text-neutral-400 mt-1 max-w-[200px]">Discover apparel fits to stack up your outfit rotation.</p>
-                    </div>
-                `;
-                elements.checkoutBtn.disabled = true;
-                elements.cartTotalPrice.textContent = '₹0.00';
-                lucide.createIcons();
+            if(cart.length === 0) {
+                emptyCartMsg.classList.remove('hidden');
+                checkoutForm.classList.add('hidden');
+                checkoutBtn.disabled = true;
+                cartItemsContainer.querySelectorAll('.cart-item').forEach(el => el.remove());
+                document.getElementById('cart-total').textContent = '₹0';
                 return;
             }
 
-            elements.checkoutBtn.disabled = false;
-            let finalPriceSum = 0;
-
-            shoppingBag.forEach(item => {
-                const itemTotal = item.price * item.qty;
-                finalPriceSum += itemTotal;
-
-                const fallbackImg = `https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=150&auto=format&fit=crop`;
-
-                const cartItemEl = document.createElement('div');
-                cartItemEl.className = "flex gap-4 items-start border-b border-brand-borderGray pb-5 last:border-0";
-                cartItemEl.innerHTML = `
-                    <div class="w-16 h-20 bg-neutral-100 flex-shrink-0 border border-brand-borderGray">
-                        <img 
-                            src="${item.image || fallbackImg}" 
-                            alt="${item.name}" 
-                            class="w-full h-full object-cover"
-                            onerror="this.src='${fallbackImg}'"
-                        />
+            emptyCartMsg.classList.add('hidden');
+            checkoutForm.classList.remove('hidden');
+            checkoutBtn.disabled = false;
+            
+            // Re-render items
+            cartItemsContainer.querySelectorAll('.cart-item').forEach(el => el.remove());
+            
+            let total = 0;
+            cart.forEach((item, index) => {
+                total += item.price * item.qty;
+                const el = document.createElement('div');
+                el.className = 'cart-item flex gap-4 bg-white p-3 rounded-xl border border-gray-100 shadow-sm';
+                el.innerHTML = `
+                    <div class="h-20 w-16 bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
+                        <img src="${item.image}" class="w-full h-full object-cover">
                     </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex justify-between items-start gap-1">
-                            <h4 class="font-heading text-xs font-bold uppercase tracking-tight text-brand-charcoal truncate">
-                                ${item.name}
-                            </h4>
-                            <button 
-                                class="remove-cart-item-btn text-neutral-400 hover:text-brand-orange transition-colors"
-                                data-id="${item.id}"
-                                data-size="${item.size}"
-                                aria-label="Remove item"
-                            >
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-                            </button>
+                    <div class="flex-1 flex flex-col justify-between">
+                        <div>
+                            <h5 class="text-sm font-bold text-dark leading-tight">${item.name}</h5>
+                            <p class="text-xs text-gray-500 mt-0.5">Size: ${item.size !== 'OS' ? item.size : 'One Size'}</p>
                         </div>
-                        <p class="text-[10px] font-heading font-extrabold uppercase text-neutral-400 tracking-wider mt-0.5">
-                            Size: <span class="text-brand-charcoal">${item.size}</span>
-                        </p>
-                        
-                        <div class="flex items-center justify-between mt-4">
-                            <!-- Quantity adjustment widgets -->
-                            <div class="flex items-center border border-brand-borderGray bg-white">
-                                <button 
-                                    class="qty-dec-btn px-2.5 py-1 text-xs hover:bg-neutral-50 border-r border-brand-borderGray"
-                                    data-id="${item.id}"
-                                    data-size="${item.size}"
-                                >
-                                    -
+                        <div class="flex items-center justify-between mt-2">
+                            <span class="font-bold text-primary text-sm">₹${new Intl.NumberFormat('en-IN').format(item.price)}</span>
+                            <div class="flex items-center bg-gray-100 rounded-lg p-1">
+                                <button onclick="updateQty(${index}, -1)" class="w-6 h-6 flex items-center justify-center text-dark hover:bg-white rounded shadow-sm transition-colors">
+                                    <i data-lucide="minus" class="h-3 w-3"></i>
                                 </button>
-                                <span class="px-3 py-1 text-xs font-bold text-brand-charcoal bg-neutral-50">${item.qty}</span>
-                                <button 
-                                    class="qty-inc-btn px-2.5 py-1 text-xs hover:bg-neutral-50 border-l border-brand-borderGray"
-                                    data-id="${item.id}"
-                                    data-size="${item.size}"
-                                >
-                                    +
+                                <span class="w-8 text-center text-xs font-bold">${item.qty}</span>
+                                <button onclick="updateQty(${index}, 1)" class="w-6 h-6 flex items-center justify-center text-dark hover:bg-white rounded shadow-sm transition-colors">
+                                    <i data-lucide="plus" class="h-3 w-3"></i>
+                                </button>
+                                <button onclick="removeItem(${index})" class="w-6 h-6 flex items-center justify-center text-red-600 hover:bg-gray-200 rounded ml-2 transition-colors">
+                                    <i data-lucide="trash-2" class="h-3 w-3"></i>
                                 </button>
                             </div>
-                            <span class="font-heading text-xs font-black text-brand-charcoal">
-                                ₹${itemTotal.toLocaleString('en-IN')}
-                            </span>
                         </div>
                     </div>
                 `;
-
-                elements.cartItemsContainer.appendChild(cartItemEl);
+                cartItemsContainer.appendChild(el);
             });
-
-            elements.cartTotalPrice.textContent = `₹${finalPriceSum.toLocaleString('en-IN')}`;
-            lucide.createIcons();
-            setupCartCallbacks();
-        }
-
-        // Attach action hooks inside current cart drawer markup
-        function setupCartCallbacks() {
-            // Trash Items Callback
-            document.querySelectorAll('.remove-cart-item-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    removeFromCart(btn.dataset.id, btn.dataset.size);
-                });
-            });
-
-            // Dec Quantities Callback
-            document.querySelectorAll('.qty-dec-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    updateQuantity(btn.dataset.id, btn.dataset.size, -1);
-                });
-            });
-
-            // Inc Quantities Callback
-            document.querySelectorAll('.qty-inc-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    updateQuantity(btn.dataset.id, btn.dataset.size, 1);
-                });
-            });
-        }
-
-        // Complete Bulk Shopping Bag WhatsApp checkout string compiling
-        function executeBulkCheckout() {
-            if (shoppingBag.length === 0) return;
-
-            let subtotal = 0;
-            let textMessage = `🔥 NEW ORDER — WILDOUT APPAREL 🔥\n\n`;
-            textMessage += `Hello Team, I would like to order the following apparel pieces:\n\n`;
-
-            shoppingBag.forEach((item, index) => {
-                const totalItemPrice = item.price * item.qty;
-                subtotal += totalItemPrice;
-                textMessage += `${index + 1}. [${item.qty}x] ${item.name}\n`;
-                textMessage += `   • Size: ${item.size}\n`;
-                textMessage += `   • Rate: ₹${item.price.toLocaleString('en-IN')} each\n`;
-                textMessage += `   • Total: ₹${totalItemPrice.toLocaleString('en-IN')}\n\n`;
-            });
-
-            textMessage += `━━━━━━━━━━━━━━━━━━━━\n`;
-            textMessage += `Grand Order Total: ₹${subtotal.toLocaleString('en-IN')}\n`;
-            textMessage += `━━━━━━━━━━━━━━━━━━━━\n\n`;
-            textMessage += `Please check stock and revert with payment information to process my streetwear shipment. Thanks!`;
-
-            const encodedURL = encodeURIComponent(textMessage);
-            const finalWhatsAppUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedURL}`;
             
-            // Redirect smoothly
-            window.open(finalWhatsAppUrl, '_blank');
+            document.getElementById('cart-total').textContent = `₹${new Intl.NumberFormat('en-IN').format(total)}`;
+            lucide.createIcons();
         }
 
-        // Basic event listeners for modal/drawers
-        function setupEventListeners() {
-            // Cart Open Toggle
-            elements.cartTrigger.addEventListener('click', () => {
-                elements.cartOverlay.classList.remove('opacity-0', 'pointer-events-none');
-                elements.cartDrawer.classList.remove('translate-x-full');
-            });
-
-            // Cart Close Toggle
-            const closeCart = () => {
-                elements.cartOverlay.classList.add('opacity-0', 'pointer-events-none');
-                elements.cartDrawer.classList.add('translate-x-full');
-            };
-
-            elements.cartClose.addEventListener('click', closeCart);
-            elements.cartOverlay.addEventListener('click', (e) => {
-                // close drawer only if clicking exact back backdrop
-                if (e.target === elements.cartOverlay) closeCart();
-            });
-
-            // Order Bulk Checkout Button click event
-            elements.checkoutBtn.addEventListener('click', () => {
-                executeBulkCheckout();
-            });
-        }
-
-        // Window Bootstrap Start
-        window.onload = function() {
-            startStorefront();
+        window.updateQty = (index, delta) => {
+            cart[index].qty += delta;
+            if (cart[index].qty <= 0) cart.splice(index, 1);
+            saveCart();
         };
+
+        // Remove item from cart
+        window.removeItem = (index) => {
+            if (confirm('Remove this item from the cart?')) {
+                cart.splice(index, 1);
+                saveCart();
+            }
+        };
+
+        function openCart() {
+            cartOverlay.classList.remove('hidden');
+            // small delay
+            setTimeout(() => {
+                cartOverlay.classList.remove('opacity-0');
+                cartDrawer.classList.remove('translate-x-full');
+                cartDrawer.classList.add('translate-x-0');
+            }, 10);
+            updateCartUI();
+        }
+
+        function closeCart() {
+            cartOverlay.classList.add('opacity-0');
+            cartDrawer.classList.remove('translate-x-0');
+            cartDrawer.classList.add('translate-x-full');
+            setTimeout(() => {
+                cartOverlay.classList.add('hidden');
+            }, 300);
+        }
+
+        cartToggle.addEventListener('click', openCart);
+        closeCartBtn.addEventListener('click', closeCart);
+        cartOverlay.addEventListener('click', closeCart);
+
+        // Checkout via WhatsApp
+        checkoutBtn.addEventListener('click', () => {
+            const name = document.getElementById('cust-name').value.trim();
+            const address = document.getElementById('cust-address').value.trim();
+            
+            if(!name || !address) {
+                alert('Please provide your name and delivery address.');
+                return;
+            }
+
+            let total = 0;
+            let msg = `*NEW ORDER - WILDOUT* 🔥\n\n`;
+            msg += `*Customer:* ${name}\n`;
+            msg += `*Address:* ${address}\n\n`;
+            msg += `*ORDER DETAILS:*\n`;
+            
+            cart.forEach(item => {
+                const sub = item.price * item.qty;
+                total += sub;
+                msg += `▪ ${item.name} (${item.size}) x${item.qty} - ₹${new Intl.NumberFormat('en-IN').format(sub)}\n`;
+            });
+
+            msg += `\n*TOTAL AMOUNT: ₹${new Intl.NumberFormat('en-IN').format(total)}*\n`;
+            
+            const encoded = encodeURIComponent(msg);
+            const phone = "918075506171";
+            
+            // clear cart
+            cart = [];
+            saveCart();
+            closeCart();
+            
+            window.open(`https://wa.me/${phone}?text=${encoded}`, '_blank');
+        });
+
+        // Init
+        updateCartUI();
     </script>
 </body>
 </html>
